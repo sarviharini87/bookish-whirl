@@ -1,0 +1,57 @@
+.containerSection {
+    background-color: #F8F3FF;
+    padding: 70px 40px;
+}
+
+.guideContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 30px auto;
+    justify-content: space-evenly;
+}
+
+.guideContainer > div {
+    width: 200px;
+    text-align: center;
+}
+
+h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: #302A4A;
+}
+
+.step-number {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: #302A4A;
+}
+
+.step1 {
+    background-color: #FFB6C1;
+}
+
+.step2 {
+    background-color: #9B8AFB;
+}
+
+.step3 {
+    background-color: #FFD166;
+}
+
+.step4 {
+    background-color: #B8E0D2;
+}

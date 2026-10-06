@@ -1,0 +1,25 @@
+.choose-section{
+    display: flex;
+    flex-direction: column;
+    margin: 40px;
+    align-items: center;
+}
+h2{
+    color: #302A4A;
+    font-family: 'Playfair Display';
+    font-size: 48px;
+    font-weight: 700;
+}
+.card-container{
+    margin: 20px ;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 20px;
+}
+.card{
+    width: 300px;
+    padding: 40px;
+    border-radius: 20px;
+    background-color: #EAF4FF;
+}
