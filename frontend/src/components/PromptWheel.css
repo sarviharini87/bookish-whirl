@@ -1,41 +1,754 @@
-.promptWheel{
-    text-align: center;
-    padding: 70px 40px;
-}
-.wheel-container{
-    position: relative;
-    width: 300px;
-    margin: 40px auto;
-}
-.wheel{
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    position: relative;
-    transition: transform 2s ease-out;
+
+.promptWheel {
+    --wheel-accent: #E83E80;
+    --ink: #302A4A;
+    --muted: #5F5875;
+    --line: #F0E1EC;
+
+    padding: 48px 5%;
+    color: var(--ink);
+
+    background:
+        radial-gradient(
+            circle at 5% 5%,
+            #FFF0EC,
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 95% 90%,
+            #EAF4FF,
+            transparent 35%
+        ),
+        #FFFCFE;
+
+    font-family: "Poppins", sans-serif;
 }
 
-.pointer{
-    position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 30px;
-    z-index: 10;
-}
-.wheel-section{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100px;
+/* Heading */
+
+.wheel-heading {
     text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    transform-origin: center;
+    margin-bottom: 28px;
 }
-.spinBtn{
+
+.eyebrow {
+    display: block;
+    color: var(--wheel-accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.wheel-heading h2 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 0 0 10px;
+    color: var(--ink);
+}
+
+.wheel-heading p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Theme selector */
+
+.wheel-toolbar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.wheel-toolbar label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.wheel-toolbar select {
+    padding: 10px 16px;
+    border: 1px solid #EACAD9;
+    border-radius: 30px;
+    background: white;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+    outline-color: var(--wheel-accent);
+}
+
+/* Main layout */
+
+.wheel-layout {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.5fr)
+        minmax(280px, 0.85fr);
+
+    gap: clamp(24px, 4vw, 55px);
+    align-items: start;
+}
+
+.wheel-area {
+    min-width: 0;
+    text-align: center;
+    padding: 8px 0;
+}
+
+/* Wheel container */
+
+.wheel-container {
+    width: 100%;
+    max-width: 490px;
+    aspect-ratio: 1;
+
+    position: relative;
+    margin: 0 auto;
+
+    isolation: isolate;
+}
+
+/* Wheel */
+
+.wheel {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    border: 5px solid #FFFFFF;
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 12px 35px rgba(48, 42, 74, 0.12),
+        0 0 0 1px rgba(232, 62, 128, 0.1);
+
+    transition:
+        transform 6s cubic-bezier(0.12, 0.72, 0.08, 1);
+
+    will-change: transform;
+}
+
+/*
+   LABEL POSITIONING
+
+   Every label starts at the exact wheel center.
+   It rotates to its slice angle.
+   It then moves outward.
+   Finally, its text rotates 90 degrees.
+
+   This is the important part for visibility.
+*/
+
+
+/* Label positioning layer */
+.wheel-label {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform: rotate(var(--label-angle));
+    transform-origin: center;
+
+    pointer-events: none;
+}
+
+/* Prompt text */
+.wheel-label span {
+    position: absolute;
+
+    /*
+      Position the text near the outer circumference.
+      10% from the top = approximately 40% radius.
+    */
+    top: 10%;
+    left: 50%;
+
+    width: var(--label-width);
+    max-width: none;
+    box-sizing: border-box;
+    padding: 0 3px;
+
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: #FFFFFF;
+    font-family: "Poppins", sans-serif;
+    font-size: var(--label-font);
+    font-weight: 700;
+    line-height: 1.25;
+
+    text-shadow:
+        0 1px 3px rgba(70, 20, 50, 0.45);
+
+    /*
+      Center the label on its anchor.
+      Rotate it tangentially.
+    */
+    transform:
+        translate(-50%, -50%)
+        rotate(90deg);
+
+    transform-origin: center;
+    pointer-events: none;
+}
+
+
+/* Fixed pointer */
+
+.wheel-pointer {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+
+    transform: translateX(-50%);
+    z-index: 5;
+
+    width: 0;
+    height: 0;
+
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 30px solid var(--wheel-accent);
+
+    filter:
+        drop-shadow(0 2px 2px rgba(48, 42, 74, 0.2));
+
+    pointer-events: none;
+}
+
+/* Center button */
+
+.wheel-container > .spinBtn {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    margin: 0;
+    padding: 0;
+
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+
+    z-index: 6;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px solid white;
+
+    background: var(--wheel-accent);
+    color: white;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+
+    box-shadow:
+        0 4px 12px rgba(48, 42, 74, 0.22);
+
     cursor: pointer;
 }
-.spinBtn:hover{
-    background-color: #FFD166;
+
+.wheel-container > .spinBtn:hover:not(:disabled) {
+    filter: brightness(1.05);
+}
+
+.wheel-container > .spinBtn:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.wheel-hint {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* Notebook */
+
+.prompt-notebook {
+    min-width: 0;
+    height: 520px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 22px;
+    box-sizing: border-box;
+
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+
+    box-shadow:
+        0 10px 35px rgba(48, 42, 74, 0.06);
+}
+
+.notebook-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.notebook-header .eyebrow {
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+.notebook-header h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 23px;
+    margin: 0;
+    color: var(--ink);
+}
+
+.prompt-count {
+    min-width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #FCE6F0;
+    color: var(--wheel-accent);
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Add prompt */
+
+.add-prompt-form {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+
+    margin-bottom: 18px;
+}
+
+.add-prompt-form input {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border: 1px solid #E8DCE6;
+    border-radius: 12px;
+
+    outline: none;
+    background: #FFFCFE;
+    color: var(--ink);
+
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.add-prompt-form input:focus {
+    border-color: var(--wheel-accent);
+}
+
+.add-prompt-form input::placeholder {
+    color: #A29AAD;
+}
+
+.add-prompt-form button {
+    flex-shrink: 0;
+
+    padding: 0 15px;
+    border: none;
+    border-radius: 12px;
+
+    background: var(--wheel-accent);
+    color: white;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.add-prompt-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollable list */
+
+.prompt-list {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-right: 5px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #E8C4D8 transparent;
+}
+
+.prompt-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    padding: 12px 8px;
+    border-bottom: 1px dashed #EDE2EA;
+    border-radius: 8px;
+}
+
+.prompt-item:hover {
+    background: #FFF5F9;
+}
+
+.prompt-number {
+    flex-shrink: 0;
+    padding-top: 2px;
+
+    color: var(--wheel-accent);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.prompt-text {
+    flex: 1;
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.delete-prompt {
+    flex-shrink: 0;
+
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+    color: #A39AA8;
+
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.delete-prompt:hover:not(:disabled) {
+    background: #FFE6EE;
+    color: #D92F68;
+}
+
+.delete-prompt:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.empty-prompts {
+    text-align: center;
+    padding: 45px 10px;
+    color: var(--muted);
+}
+
+.empty-prompts span {
+    font-size: 32px;
+}
+
+.empty-prompts p {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.empty-prompts small {
+    font-size: 11px;
+}
+
+.notebook-footer {
+    border-top: 1px solid var(--line);
+    margin: 12px 0 0;
+    padding-top: 12px;
+
+    color: #96899E;
+    font-size: 10px;
+    text-align: center;
+}
+
+/* Winner popup */
+
+.winner-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    background: rgba(39, 30, 51, 0.48);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    animation: fadeIn 0.2s ease;
+}
+
+.winner-modal {
+    position: relative;
+
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+
+    padding: 38px 30px;
+
+    border: 1px solid #F5E1ED;
+    border-radius: 26px;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            #FFF0F6,
+            transparent 50%
+        ),
+        #FFFCFE;
+
+    box-shadow:
+        0 20px 70px rgba(30, 20, 50, 0.2);
+
+    text-align: center;
+
+    animation: popIn 0.3s ease;
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #F9ECF3;
+    color: var(--ink);
+
+    font-size: 21px;
+    cursor: pointer;
+}
+
+.winner-sparkle {
+    display: block;
+    font-size: 34px;
+    margin-bottom: 14px;
+}
+
+.winner-modal h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 29px;
+    line-height: 1.3;
+
+    color: var(--ink);
+    margin: 8px 0 22px;
+}
+
+.winner-prompt {
+    padding: 22px;
+
+    border: 1px solid #F4D5E4;
+    border-radius: 17px;
+
+    background: #FFF4F8;
+    color: var(--ink);
+
+    font-family: "Playfair Display", serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+.winner-subtitle {
+    margin: 18px 0 22px;
+
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.winner-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.winner-actions button {
+    flex: 1;
+    min-width: 0;
+
+    padding: 12px 10px;
+
+    border-radius: 12px;
+
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.keep-btn {
+    background: var(--wheel-accent);
+    border: 1px solid var(--wheel-accent);
+    color: white;
+}
+
+.delete-btn {
+    background: white;
+    border: 1px solid #E8CAD9;
+    color: #B84268;
+}
+
+.winner-actions button:hover {
+    filter: brightness(0.97);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Tablet */
+
+@media (max-width: 850px) {
+    .wheel-layout {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 560px;
+    }
+
+    .prompt-notebook {
+        height: 430px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+    .promptWheel {
+        padding: 35px 16px;
+    }
+
+    .wheel-container {
+        max-width: 100%;
+    }
+
+    .wheel {
+        border-width: 3px;
+    }
+
+    .wheel-container > .spinBtn {
+        width: 64px;
+        height: 64px;
+        min-width: 64px;
+        font-size: 16px;
+    }
+
+    .prompt-notebook {
+        padding: 16px;
+        border-radius: 18px;
+    }
+
+    .notebook-header h3 {
+        font-size: 21px;
+    }
+
+    .winner-modal {
+        padding: 34px 20px 24px;
+    }
+
+    .winner-modal h2 {
+        font-size: 25px;
+    }
+
+    .winner-prompt {
+        font-size: 19px;
+        padding: 18px;
+    }
+
+    .winner-actions {
+        flex-direction: column;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .wheel {
+        transition-duration: 0.01ms;
+    }
+
+    .winner-overlay,
+    .winner-modal {
+        animation: none;
+    }
 }
